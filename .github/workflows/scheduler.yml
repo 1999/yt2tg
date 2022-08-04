@@ -1,5 +1,7 @@
 name: "Fetch new videos and send them to Telegram"
 on:
+  push:
+  pull_request:
   schedule:
     - cron: 0 * * * *
 jobs:
@@ -13,3 +15,5 @@ jobs:
       - run: npm install
       - run: npm run build
       - run: npm start
+        env:
+          GOOGLE_OAUTH_CREDENTIALS: ${{ secrets.GOOGLE_OAUTH_CREDENTIALS }}
