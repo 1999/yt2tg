@@ -12,6 +12,11 @@ type Video = {
   title: string;
 };
 
+type ChannelVideos = {
+  channelId: string;
+  videos: Video[];
+};
+
 type PagedVideos = {
   videos: Video[];
   nextPageToken?: string;
@@ -170,9 +175,9 @@ export const getNewVideos = async (
   redirectUri: string,
   credentials: Credentials,
   publishedAfter?: Date
-): Promise<any[]> => {
+): Promise<ChannelVideos[]> => {
   const channels = await getSubscriptionChannels(clientId, clientSecret, redirectUri, credentials);
-  const ops = channels.slice(0, 1).map(async (channelId) => {
+  const ops = channels.map(async (channelId) => {
     const videos = await getUploadedVideosForChannel(
       clientId,
       clientSecret,

@@ -4,19 +4,23 @@ import open from 'open';
 import destroyer from 'server-destroy';
 import { Credentials } from 'google-auth-library';
 
+const OAUTH_SCOPES = [
+  'https://www.googleapis.com/auth/youtube',
+  'https://www.googleapis.com/auth/youtube.channel-memberships.creator',
+  'https://www.googleapis.com/auth/youtube.force-ssl',
+  'https://www.googleapis.com/auth/youtube.readonly',
+  'https://www.googleapis.com/auth/youtube.upload',
+  'https://www.googleapis.com/auth/youtubepartner',
+  'https://www.googleapis.com/auth/youtubepartner-channel-audit',
+];
+
 /**
  * Run this function and save the stdout
  */
-export const getOAuthTokens = async (clientId: string, clientSecret: string, redirectUri: string, scopes: string[]) => {
-  const tokens = await fetchOAuthTokens(clientId, clientSecret, redirectUri, scopes);
-  console.log(JSON.stringify(tokens));
-};
-
-const fetchOAuthTokens = (
+export const getOAuthTokens = async (
   clientId: string,
   clientSecret: string,
-  redirectUri: string,
-  scopes: string[]
+  redirectUri: string
 ): Promise<Credentials> => {
   const oauth2Client = new google.auth.OAuth2(clientId, clientSecret, redirectUri);
   google.options({ auth: oauth2Client });
@@ -25,7 +29,7 @@ const fetchOAuthTokens = (
     // grab the url that will be used for authorization
     const authorizeUrl = oauth2Client.generateAuthUrl({
       access_type: 'offline',
-      scope: scopes.join(' '),
+      scope: OAUTH_SCOPES.join(' '),
     });
 
     const server = createServer(async (req, res) => {
