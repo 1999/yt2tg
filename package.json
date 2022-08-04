@@ -1,0 +1,24 @@
+{
+  "name": "@1999/yt2tg",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "token": "node dist/"
+  },
+  "author": "Dmitrii Sorin",
+  "dependencies": {
+    "googleapis": "^105.0.0",
+    "node-fetch": "^3.2.9",
+    "open": "^8.4.0",
+    "server-destroy": "^1.0.1"
+  },
+  "devDependencies": {
+    "@types/server-destroy": "^1.0.1",
+    "google-auth-library": "^8.1.1",
+    "prettier": "^2.7.1",
+    "typescript": "^4.7.4"
+  },
+  "peerDependencies": {
+    "google-auth-library": "^8.1.1"
+  }
+}

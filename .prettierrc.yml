@@ -1,0 +1,13 @@
+parser: typescript
+printWidth: 120
+singleQuote: true
+jsxSingleQuote: false
+arrowParens: always
+
+# https://github.com/trivago/prettier-plugin-sort-imports
+# Sort imports in order:
+# 3rd party, upper directory, current directory
+importOrder: ['<THIRD_PARTY_MODULES>', '^(../)', '^(./)']
+importOrderSeparation: true
+importOrderSortSpecifiers: true
+importOrderGroupNamespaceSpecifiers: true
