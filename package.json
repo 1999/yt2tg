@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "token": "node dist/"
+    "build": "tsc",
+    "start": "node dist/main.js"
   },
   "author": "Dmitrii Sorin",
   "dependencies": {
