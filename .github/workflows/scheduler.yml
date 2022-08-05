@@ -21,6 +21,11 @@ jobs:
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_CLIENT_REDIRECT_URI: ${{ secrets.GOOGLE_OAUTH_CLIENT_REDIRECT_URI }}
+      - run: date -u +"%Y-%m-%dT%H:%M:%SZ" > last_execution_date
+      - uses: actions/upload-artifact@v3
+        with:
+          name: last_execution_date
+          path: last_execution_date
       - run: npm run telegram
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
