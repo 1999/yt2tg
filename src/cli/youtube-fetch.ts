@@ -32,13 +32,13 @@ async function main() {
 
   const output = new Array<string>();
   for (const { videos } of channelVideos) {
-    for (const { id, channelTitle, title } of videos) {
+    for (const { id } of videos) {
       const videoUrl = getVideoUrl(id);
-      output.push(`[${channelTitle} - ${title}] ${videoUrl}`);
+      output.push(videoUrl);
     }
   }
 
-  setOutput('videos', JSON.stringify(output));
+  setOutput('videos', output);
 }
 
 main().catch((err: Error) => {
