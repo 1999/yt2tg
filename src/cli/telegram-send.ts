@@ -17,12 +17,9 @@ async function main() {
   const videos = JSON.parse(process.env.VIDEOS) as string[];
   info(`Videos found: ${videos.length}`);
 
-  const ops = new Array<Promise<void>>();
   for (const video of videos) {
-    ops.push(sendMesage(process.env.TELEGRAM_CHAT_ID, video, process.env.TELEGRAM_BOT_TOKEN));
+    await sendMesage(process.env.TELEGRAM_CHAT_ID, video, process.env.TELEGRAM_BOT_TOKEN);
   }
-
-  await Promise.all(ops);
 }
 
 main().catch((err: Error) => {
