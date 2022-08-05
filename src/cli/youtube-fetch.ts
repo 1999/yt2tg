@@ -1,4 +1,4 @@
-import { warning, setOutput } from '@actions/core';
+import { info, warning, setOutput } from '@actions/core';
 import { resolve as resolvePath } from 'path';
 import { promises as fs } from 'fs';
 import { getNewVideos, getVideoUrl } from '../youtube';
@@ -22,6 +22,9 @@ const getLastExecutionDate = async (logger: Logger): Promise<Date> => {
 };
 
 async function main() {
+  const since = await getLastExecutionDate({ warning });
+  info(`Fetching videos since ${since}`);
+
   if (!process.env.GOOGLE_OAUTH_CLIENT_ID) {
     throw new Error('GOOGLE_OAUTH_CLIENT_ID env is not set');
   }
@@ -43,7 +46,7 @@ async function main() {
     process.env.GOOGLE_OAUTH_CLIENT_SECRET,
     process.env.GOOGLE_OAUTH_CLIENT_REDIRECT_URI,
     JSON.parse(process.env.GOOGLE_OAUTH_CREDENTIALS),
-    await getLastExecutionDate({ warning })
+    since
   );
 
   const output = new Array<string>();
