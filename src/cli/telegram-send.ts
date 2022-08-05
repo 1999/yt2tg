@@ -14,7 +14,6 @@ async function main() {
     throw new Error('VIDEOS env is not set');
   }
 
-  info('VIDEOS: ' + process.env.VIDEOS + '.');
   const videos = JSON.parse(process.env.VIDEOS) as string[];
   info(`Videos found: ${videos.length}`);
 

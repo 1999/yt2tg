@@ -54,8 +54,6 @@ async function main() {
     }
   }
 
-  output.push('debug string?');
-
   setOutput('videos', JSON.stringify(output));
 }
 

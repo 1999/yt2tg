@@ -36,4 +36,4 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          VIDEOS: ${{ steps.youtube.outputs.videos }}"
+          VIDEOS: ${{ steps.youtube.outputs.videos }}
