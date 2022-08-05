@@ -1,4 +1,4 @@
-import { getInput, info } from '@actions/core';
+import { info } from '@actions/core';
 import { sendMesage } from '../telegram';
 
 async function main() {
@@ -10,8 +10,11 @@ async function main() {
     throw new Error('TELEGRAM_CHAT_ID env is not set');
   }
 
-  const videosString = getInput('videos', { required: true });
-  const videos = JSON.parse(videosString) as string[];
+  if (!process.env.VIDEOS) {
+    throw new Error('VIDEOS env is not set');
+  }
+
+  const videos = JSON.parse(process.env.VIDEOS) as string[];
   info(`Videos found: ${videos.length}`);
 
   const ops = new Array<Promise<void>>();

@@ -21,6 +21,7 @@ jobs:
         # download-artifact can fail due to missing artifact, this is fine
         continue-on-error: true
       - run: npm run youtube
+        id: youtube
         env:
           GOOGLE_OAUTH_CREDENTIALS: ${{ secrets.GOOGLE_OAUTH_CREDENTIALS }}
           GOOGLE_OAUTH_CLIENT_ID: ${{ secrets.GOOGLE_OAUTH_CLIENT_ID }}
@@ -35,3 +36,4 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          VIDEOS: ${{ steps.youtube.outputs.videos }}"
