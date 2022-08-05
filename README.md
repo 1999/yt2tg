@@ -16,4 +16,5 @@ YouTube Data API and People API.
 ## How to use
 
 1. Run `npm run token` to get the credentials to run YouTube scripts
-1. Run `npm run youtube` to fetch new videos
+2. Run `npm run youtube` to fetch new videos
+3. Run `npm run telegram` to send messages
