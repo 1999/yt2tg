@@ -1,4 +1,4 @@
-import actionsCore from '@actions/core';
+import { warning } from '@actions/core';
 import { resolve as resolvePath } from 'path';
 import { promises as fs } from 'fs';
 import { getNewVideos } from '../youtube';
@@ -43,7 +43,7 @@ async function main() {
     process.env.GOOGLE_OAUTH_CLIENT_SECRET,
     process.env.GOOGLE_OAUTH_CLIENT_REDIRECT_URI,
     JSON.parse(process.env.GOOGLE_OAUTH_CREDENTIALS),
-    await getLastExecutionDate(actionsCore)
+    await getLastExecutionDate({ warning })
   );
 
   console.log(JSON.stringify(videos, null, 2));
