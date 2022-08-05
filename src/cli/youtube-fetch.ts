@@ -54,7 +54,7 @@ async function main() {
     }
   }
 
-  setOutput('videos', output);
+  setOutput('videos', JSON.stringify(output));
 }
 
 main().catch((err: Error) => {
