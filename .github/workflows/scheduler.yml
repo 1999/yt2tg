@@ -18,6 +18,8 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           name: last_execution_date
+        # download-artifact can fail due to missing artifact, this is fine
+        continue-on-error: true
       - run: npm run youtube
         env:
           GOOGLE_OAUTH_CREDENTIALS: ${{ secrets.GOOGLE_OAUTH_CREDENTIALS }}
