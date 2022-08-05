@@ -1,4 +1,25 @@
+import actionsCore from '@actions/core';
+import { resolve as resolvePath } from 'path';
+import { promises as fs } from 'fs';
 import { getNewVideos } from '../youtube';
+
+type Logger = {
+  warning: (message: string) => void;
+};
+
+const LAST_EXECUTION_DATE_ARTIFACT_NAME = 'last_execution_date';
+
+const getLastExecutionDate = async (logger: Logger): Promise<Date> => {
+  try {
+    const expectedArtifactPath = resolvePath(__dirname, '../../', LAST_EXECUTION_DATE_ARTIFACT_NAME);
+    const lastExecutionDate = await fs.readFile(expectedArtifactPath, { encoding: 'utf-8' });
+
+    return new Date(lastExecutionDate);
+  } catch (err) {
+    logger.warning(`Could not read last execution date artifact: ${err}`);
+    return new Date();
+  }
+};
 
 async function main() {
   if (!process.env.GOOGLE_OAUTH_CLIENT_ID) {
@@ -22,7 +43,7 @@ async function main() {
     process.env.GOOGLE_OAUTH_CLIENT_SECRET,
     process.env.GOOGLE_OAUTH_CLIENT_REDIRECT_URI,
     JSON.parse(process.env.GOOGLE_OAUTH_CREDENTIALS),
-    new Date()
+    await getLastExecutionDate(actionsCore)
   );
 
   console.log(JSON.stringify(videos, null, 2));
