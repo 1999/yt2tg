@@ -1,3 +1,4 @@
+import { getInput, info } from '@actions/core';
 import { sendMesage } from '../telegram';
 
 async function main() {
@@ -9,11 +10,16 @@ async function main() {
     throw new Error('TELEGRAM_CHAT_ID env is not set');
   }
 
-  await sendMesage(
-    process.env.TELEGRAM_CHAT_ID,
-    'Function executed through Github actions',
-    process.env.TELEGRAM_BOT_TOKEN
-  );
+  const videosString = getInput('videos', { required: true });
+  const videos = JSON.parse(videosString) as string[];
+  info(`Videos found: ${videos.length}`);
+
+  const ops = new Array<Promise<void>>();
+  for (const video of videos) {
+    ops.push(sendMesage(process.env.TELEGRAM_CHAT_ID, video, process.env.TELEGRAM_BOT_TOKEN));
+  }
+
+  await Promise.all(ops);
 }
 
 main().catch((err: Error) => {

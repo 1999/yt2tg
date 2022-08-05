@@ -1,7 +1,7 @@
-import { warning } from '@actions/core';
+import { warning, setOutput } from '@actions/core';
 import { resolve as resolvePath } from 'path';
 import { promises as fs } from 'fs';
-import { getNewVideos } from '../youtube';
+import { getNewVideos, getVideoUrl } from '../youtube';
 
 type Logger = {
   warning: (message: string) => void;
@@ -38,7 +38,7 @@ async function main() {
     throw new Error('GOOGLE_OAUTH_CREDENTIALS env is not set');
   }
 
-  const videos = await getNewVideos(
+  const channelVideos = await getNewVideos(
     process.env.GOOGLE_OAUTH_CLIENT_ID,
     process.env.GOOGLE_OAUTH_CLIENT_SECRET,
     process.env.GOOGLE_OAUTH_CLIENT_REDIRECT_URI,
@@ -46,7 +46,15 @@ async function main() {
     await getLastExecutionDate({ warning })
   );
 
-  console.log(JSON.stringify(videos, null, 2));
+  const output = new Array<string>();
+  for (const { videos } of channelVideos) {
+    for (const { id, channelTitle, title } of videos) {
+      const videoUrl = getVideoUrl(id);
+      output.push(`[${channelTitle} - ${title}] ${videoUrl}`);
+    }
+  }
+
+  setOutput('videos', output);
 }
 
 main().catch((err: Error) => {
