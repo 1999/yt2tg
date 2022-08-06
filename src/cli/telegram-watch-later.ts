@@ -1,10 +1,10 @@
 import { getNewPinnedMessages } from '../telegram';
-import { warning } from '@actions/core';
+import { info, warning } from '@actions/core';
 import { promises as fs } from 'fs';
 
 const CACHE_FILE_PATH = 'telegram_last_update_id';
 
-const getLastUpdateId = async (): Promise<string | void> => {
+const getLastUpdateId = async (): Promise<string | undefined> => {
   try {
     return fs.readFile(CACHE_FILE_PATH, { encoding: 'utf-8' });
   } catch (err) {
@@ -27,8 +27,22 @@ async function main() {
   }
 
   const lastUpdateId = await getLastUpdateId();
-  // await getNewPinnedMessages(process.env.TELEGRAM_BOT_TOKEN, process.env.TELEGRAM_CHAT_ID, 908776462);
+  const pinnedMessages = await getNewPinnedMessages(
+    process.env.TELEGRAM_BOT_TOKEN,
+    process.env.TELEGRAM_CHAT_ID,
+    lastUpdateId
+  );
+
+  if (!pinnedMessages.length) {
+    info('No new pinned messages');
+    return;
+  }
+
+  console.log(JSON.stringify(pinnedMessages, null, 2));
+
   // await unpinMessage(process.env.TELEGRAM_BOT_TOKEN, process.env.TELEGRAM_CHAT_ID, 107);
+
+  // get all updates: update.update_id and update.channel_post.pinned_message.text, update.channel_post.message_id
 
   await setLastUpdateId('1');
 }

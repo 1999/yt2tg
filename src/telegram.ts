@@ -1,3 +1,25 @@
+type Update = {
+  id: number;
+  message: {
+    id: number;
+    text: string;
+  };
+};
+
+type UpdatesResponse = {
+  ok: boolean;
+  result: {
+    update_id: number;
+    channel_post?: {
+      message_id: number;
+      pinned_message?: {
+        message_id: number;
+        text: string;
+      };
+    };
+  }[];
+};
+
 /**
  * @see https://core.telegram.org/bots/api#available-methods
  */
@@ -33,20 +55,37 @@ export const sendMesage = async (chatId: string, text: string, token: string): P
   });
 
   if (!response.ok) {
-    throw new Error(`Failed to send message to Telegram (${status})`);
+    throw new Error(`Failed to send message (${status})`);
   }
 };
 
 /**
  * @see https://core.telegram.org/bots/api#getupdates
  */
-export const getNewPinnedMessages = async (token: string, chatId: string, offset?: number): Promise<void> => {
-  const { response, status } = await sendHttpRequest<unknown>(token, 'getUpdates', {
+export const getNewPinnedMessages = async (token: string, chatId: string, offset?: string): Promise<Update[]> => {
+  const { response, status } = await sendHttpRequest<UpdatesResponse>(token, 'getUpdates', {
     allowed_updates: ['channel_post'],
     ...(offset ? { offset } : {}),
   });
 
-  console.log(JSON.stringify(response, null, 2));
+  if (!response.ok) {
+    throw new Error(`Could not get updates (${status})`);
+  }
+
+  const output = new Array<Update>();
+  for (const item of response.result) {
+    if (item.channel_post?.pinned_message) {
+      output.push({
+        id: item.update_id,
+        message: {
+          id: item.channel_post.message_id,
+          text: item.channel_post.pinned_message.text,
+        },
+      });
+    }
+  }
+
+  return output;
 };
 
 export const unpinMessage = async (token: string, chatId: string, id: number): Promise<void> => {
