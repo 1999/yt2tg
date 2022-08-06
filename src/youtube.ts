@@ -1,19 +1,23 @@
 import { google, youtube_v3 } from 'googleapis';
 import { Credentials } from 'google-auth-library';
 
-type PagedSubscriptions = {
-  channels: string[];
-  nextPageToken?: string;
-};
-
 type Video = {
   id: string;
-  channelTitle: string;
   title: string;
 };
 
+type Channel = {
+  id: string;
+  title: string;
+};
+
+type PagedSubscriptions = {
+  channels: Channel[];
+  nextPageToken?: string;
+};
+
 type ChannelVideos = {
-  channelId: string;
+  channel: Channel;
   videos: Video[];
 };
 
@@ -50,14 +54,15 @@ const getSubscriptionChannelsPaged = async (
     { responseType: 'json' }
   );
 
-  const channels =
-    subscriptions.data.items?.reduce((memo, item) => {
-      if (item.snippet?.resourceId?.channelId) {
-        memo.push(item.snippet.resourceId.channelId);
-      }
-
-      return memo;
-    }, new Array<string>()) || [];
+  const channels = new Array<Channel>();
+  for (const item of subscriptions.data.items || []) {
+    if (item.snippet?.resourceId?.channelId) {
+      channels.push({
+        id: item.snippet.resourceId.channelId,
+        title: item.snippet.channelTitle || 'Untitled',
+      });
+    }
+  }
 
   return {
     channels,
@@ -87,7 +92,6 @@ const getUploadedVideosForChannelPaged = async (
     if (item.snippet?.type === 'upload' && item.contentDetails?.upload?.videoId) {
       videos.push({
         id: item.contentDetails.upload.videoId,
-        channelTitle: item.snippet.channelTitle || '',
         title: item.snippet.title || 'Untitled',
       });
     }
@@ -154,9 +158,9 @@ const getSubscriptionChannels = async (
   clientSecret: string,
   redirectUri: string,
   credentials: Credentials
-): Promise<string[]> => {
+): Promise<Channel[]> => {
   const youtube = getYoutubeClient(clientId, clientSecret, redirectUri, credentials);
-  const allChannels = new Array<string>();
+  const allChannels = new Array<Channel>();
   let pageToken: string | undefined = undefined;
 
   do {
@@ -177,16 +181,16 @@ export const getNewVideos = async (
   publishedAfter?: Date
 ): Promise<ChannelVideos[]> => {
   const channels = await getSubscriptionChannels(clientId, clientSecret, redirectUri, credentials);
-  const ops = channels.map(async (channelId) => {
+  const ops = channels.map(async (channel) => {
     const videos = await getUploadedVideosForChannel(
       clientId,
       clientSecret,
       redirectUri,
       credentials,
-      channelId,
+      channel.id,
       publishedAfter
     );
-    return { channelId, videos };
+    return { channel, videos };
   });
 
   const videos = await Promise.all(ops);

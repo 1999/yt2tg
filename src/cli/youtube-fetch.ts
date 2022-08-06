@@ -31,10 +31,10 @@ async function main() {
   );
 
   const output = new Array<string>();
-  for (const { videos } of channelVideos) {
-    for (const { id } of videos) {
-      const videoUrl = getVideoUrl(id);
-      output.push(videoUrl);
+  for (const { channel, videos } of channelVideos) {
+    for (const video of videos) {
+      const message = `[${video.id}] ${channel.title} - ${video.title}`;
+      output.push(message);
     }
   }
 
