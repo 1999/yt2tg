@@ -1,5 +1,5 @@
 import { getNewPinnedMessages } from '../telegram';
-import { restoreCache } from '@actions/cache';
+import { restoreCache, saveCache } from '@actions/cache';
 import { info, warning } from '@actions/core';
 import { promises as fs } from 'fs';
 
@@ -18,6 +18,11 @@ const getLastUpdateId = async (): Promise<string | void> => {
   return fs.readFile(CACHE_FILE_PATH, { encoding: 'utf-8' });
 };
 
+const setLastUpdateId = async (lastUpdateId: string): Promise<void> => {
+  await fs.writeFile(CACHE_FILE_PATH, lastUpdateId);
+  await saveCache([CACHE_FILE_PATH], CACHE_KEY);
+};
+
 async function main() {
   if (!process.env.TELEGRAM_BOT_TOKEN) {
     throw new Error('TELEGRAM_BOT_TOKEN env is not set');
@@ -30,6 +35,8 @@ async function main() {
   const lastUpdateId = await getLastUpdateId();
   // await getNewPinnedMessages(process.env.TELEGRAM_BOT_TOKEN, process.env.TELEGRAM_CHAT_ID, 908776462);
   // await unpinMessage(process.env.TELEGRAM_BOT_TOKEN, process.env.TELEGRAM_CHAT_ID, 107);
+
+  await setLastUpdateId('1');
 }
 
 main().catch((err: Error) => {
