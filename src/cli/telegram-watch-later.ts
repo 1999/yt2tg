@@ -6,7 +6,7 @@ const CACHE_FILE_PATH = 'telegram_last_update_id';
 
 const getLastUpdateId = async (): Promise<string | undefined> => {
   try {
-    return fs.readFile(CACHE_FILE_PATH, { encoding: 'utf-8' });
+    return await fs.readFile(CACHE_FILE_PATH, { encoding: 'utf-8' });
   } catch (err) {
     warning('Could not find last update ID cache file');
     return;
