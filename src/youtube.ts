@@ -59,7 +59,7 @@ const getSubscriptionChannelsPaged = async (
     if (item.snippet?.resourceId?.channelId) {
       channels.push({
         id: item.snippet.resourceId.channelId,
-        title: item.snippet.channelTitle || 'Untitled',
+        title: item.snippet.title || 'Untitled',
       });
     }
   }
