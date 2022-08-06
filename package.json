@@ -5,11 +5,13 @@
   "scripts": {
     "build": "tsc",
     "telegram": "node dist/cli/telegram-send.js",
+    "watchlater": "node dist/cli/telegram-watch-later.js",
     "token": "node dist/cli/get-oauth-token.js",
     "youtube": "node dist/cli/youtube-fetch.js"
   },
   "author": "Dmitrii Sorin",
   "dependencies": {
+    "@actions/cache": "^3.0.1",
     "@actions/core": "^1.9.0",
     "googleapis": "^105.0.0",
     "node-fetch": "^3.2.9",
