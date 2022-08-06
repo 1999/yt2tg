@@ -14,10 +14,6 @@ jobs:
         with:
           node-version-file: '.nvmrc'
           cache: 'npm'
-      - uses: actions/cache@v3
-        with:
-          path: telegram_last_update_id
-          key: telegram_last_update_id
       - run: npm install
       - run: npm run build
 #      - run: npm run youtube
@@ -36,3 +32,7 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: telegram_last_update_id
+          path: telegram_last_update_id
