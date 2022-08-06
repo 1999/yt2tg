@@ -27,6 +27,8 @@ async function main() {
   }
 
   const lastUpdateId = await getLastUpdateId();
+  info(`Last update ID offset: ${lastUpdateId}`);
+
   const pinnedMessages = await getNewPinnedMessages(
     process.env.TELEGRAM_BOT_TOKEN,
     process.env.TELEGRAM_CHAT_ID,
