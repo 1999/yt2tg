@@ -13,8 +13,8 @@ const getLastUpdateId = async (): Promise<string | undefined> => {
   }
 };
 
-const setLastUpdateId = async (lastUpdateId: string): Promise<void> => {
-  await fs.writeFile(CACHE_FILE_PATH, lastUpdateId);
+const setLastUpdateId = async (lastUpdateId: number): Promise<void> => {
+  await fs.writeFile(CACHE_FILE_PATH, lastUpdateId.toString());
 };
 
 async function main() {
@@ -44,7 +44,7 @@ async function main() {
 
   // get all updates: update.update_id and update.channel_post.pinned_message.text, update.channel_post.message_id
 
-  await setLastUpdateId('1');
+  await setLastUpdateId(pinnedMessages.at(-1)!.id);
 }
 
 main().catch((err: Error) => {
