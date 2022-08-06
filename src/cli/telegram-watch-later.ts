@@ -1,26 +1,20 @@
 import { getNewPinnedMessages } from '../telegram';
-import { restoreCache, saveCache } from '@actions/cache';
-import { info, warning } from '@actions/core';
+import { warning } from '@actions/core';
 import { promises as fs } from 'fs';
 
-const CACHE_KEY = 'telegram_last_update_id';
 const CACHE_FILE_PATH = 'telegram_last_update_id';
 
 const getLastUpdateId = async (): Promise<string | void> => {
-  const cacheKey = await restoreCache([CACHE_FILE_PATH], CACHE_KEY);
-
-  if (!cacheKey) {
-    warning('Could not find an artifact for last update ID');
+  try {
+    return fs.readFile(CACHE_FILE_PATH, { encoding: 'utf-8' });
+  } catch (err) {
+    warning('Could not find last update ID cache file');
     return;
   }
-
-  info('Found artifact for last update ID');
-  return fs.readFile(CACHE_FILE_PATH, { encoding: 'utf-8' });
 };
 
 const setLastUpdateId = async (lastUpdateId: string): Promise<void> => {
   await fs.writeFile(CACHE_FILE_PATH, lastUpdateId);
-  await saveCache([CACHE_FILE_PATH], CACHE_KEY);
 };
 
 async function main() {
