@@ -12,6 +12,7 @@
   "author": "Dmitrii Sorin",
   "dependencies": {
     "@actions/core": "^1.9.0",
+    "@octokit/core": "^4.0.4",
     "googleapis": "^105.0.0",
     "node-fetch": "^3.2.9",
     "open": "^8.4.0",
