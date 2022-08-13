@@ -30,11 +30,11 @@ jobs:
           path: youtube_last_fetch_date
           if-no-files-found: error
       - run: npm run telegram
+        with:
+          videos: ${{ steps.youtube.outputs.videos }}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        with:
-          videos: ${{ steps.youtube.outputs.videos }}
 #      - run: npm run watchlater
 #        env:
 #          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
