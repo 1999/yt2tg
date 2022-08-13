@@ -1,4 +1,4 @@
-import { info } from '@actions/core';
+import { getInput, info } from '@actions/core';
 import { sendMesage } from '../telegram';
 
 async function main() {
@@ -14,7 +14,8 @@ async function main() {
     throw new Error('VIDEOS env is not set');
   }
 
-  const videos = JSON.parse(process.env.VIDEOS) as string[];
+  const fetchedVideos = getInput('videos', { required: true });
+  const videos = JSON.parse(fetchedVideos) as string[];
   info(`Videos found: ${videos.length}`);
 
   for (const video of videos) {
