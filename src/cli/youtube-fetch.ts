@@ -1,34 +1,36 @@
-import { info, warning, setOutput } from '@actions/core';
-import { getNewVideos, getVideoUrl } from '../youtube';
+import { promises as fs } from 'fs';
+import { info, setOutput } from '@actions/core';
+import { getNewVideos } from '../youtube';
+import { readLatestArtifact } from '../github';
+import { checkEnvironmentVariableSet } from './environment';
 
-async function main() {
+const LAST_FETCH_ARTIFACT_NAME = 'youtube_last_fetch_date';
+
+const getSinceDate = async (githubToken: string): Promise<Date> => {
+  const previousLastFetchDate = await readLatestArtifact(repoOwner, repoName, githubToken, LAST_FETCH_ARTIFACT_NAME);
+  if (previousLastFetchDate) {
+    return new Date(previousLastFetchDate);
+  }
+
   const since = new Date();
   since.setHours(since.getHours() - 1);
+
+  return since;
+};
+
+async function main() {
+  const [clientId, clientSecret, redirectUri, credentials, githubToken] = checkEnvironmentVariableSet(
+    'GOOGLE_OAUTH_CLIENT_ID',
+    'GOOGLE_OAUTH_CLIENT_SECRET',
+    'GOOGLE_OAUTH_CLIENT_REDIRECT_URI',
+    'GOOGLE_OAUTH_CREDENTIALS',
+    'GITHUB_TOKEN'
+  );
+
+  const since = await getSinceDate(githubToken);
   info(`Fetching videos since ${since}`);
 
-  if (!process.env.GOOGLE_OAUTH_CLIENT_ID) {
-    throw new Error('GOOGLE_OAUTH_CLIENT_ID env is not set');
-  }
-
-  if (!process.env.GOOGLE_OAUTH_CLIENT_SECRET) {
-    throw new Error('GOOGLE_OAUTH_CLIENT_SECRET env is not set');
-  }
-
-  if (!process.env.GOOGLE_OAUTH_CLIENT_REDIRECT_URI) {
-    throw new Error('GOOGLE_OAUTH_CLIENT_REDIRECT_URI env is not set');
-  }
-
-  if (!process.env.GOOGLE_OAUTH_CREDENTIALS) {
-    throw new Error('GOOGLE_OAUTH_CREDENTIALS env is not set');
-  }
-
-  const channelVideos = await getNewVideos(
-    process.env.GOOGLE_OAUTH_CLIENT_ID,
-    process.env.GOOGLE_OAUTH_CLIENT_SECRET,
-    process.env.GOOGLE_OAUTH_CLIENT_REDIRECT_URI,
-    JSON.parse(process.env.GOOGLE_OAUTH_CREDENTIALS),
-    since
-  );
+  const channelVideos = await getNewVideos(clientId, clientSecret, redirectUri, JSON.parse(credentials), since);
 
   const output = new Array<string>();
   for (const { channel, videos } of channelVideos) {
@@ -39,6 +41,7 @@ async function main() {
   }
 
   setOutput('videos', output);
+  await fs.writeFile(LAST_FETCH_ARTIFACT_NAME, new Date().toISOString());
 }
 
 main().catch((err: Error) => {
