@@ -95,6 +95,6 @@ export const unpinMessage = async (token: string, chatId: string, id: number): P
   });
 
   if (!response.ok) {
-    throw new Error('Failed to unpin message');
+    throw new Error(`Failed to unpin message (${status})`);
   }
 };
