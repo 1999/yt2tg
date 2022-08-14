@@ -1,6 +1,6 @@
 import { promises as fs } from 'fs';
 import { info, setOutput } from '@actions/core';
-import { getNewVideos } from '../youtube';
+import { getNewVideos, getVideoUrl } from '../youtube';
 import { readLatestArtifact } from '../github';
 import { checkEnvironmentVariableSet } from './environment';
 
@@ -43,8 +43,8 @@ async function main() {
   const output = new Array<string>();
   for (const { channel, videos } of channelVideos) {
     for (const video of videos) {
-      const message = { channel, video };
-      output.push(JSON.stringify(message));
+      const message = getVideoUrl(video.id);
+      output.push(message);
     }
   }
 
