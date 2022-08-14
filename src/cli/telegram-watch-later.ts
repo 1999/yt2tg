@@ -47,6 +47,8 @@ async function main() {
   // get all updates: update.update_id and update.channel_post.pinned_message.text, update.channel_post.message_id
 
   await setLastUpdateId(pinnedMessages.at(-1)!.id);
+
+  // telegram_last_update_id
 }
 
 main().catch((err: Error) => {
