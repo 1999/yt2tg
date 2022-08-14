@@ -39,15 +39,18 @@ jobs:
           VIDEOS: ${{ steps.youtube.outputs.videos }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-#      - run: npm run watchlater
-#        env:
-#          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-#          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-#          GITHUB_TOKEN: ${{ github.token }}
-#  - name: Save last chat update ID as an artifact
-#      uses: actions/upload-artifact@v3
-#      with:
-#        name: telegram_last_update_id
-#        path: telegram_last_update_id
-#        if-no-files-found: error
+      - name: Process pinned messages
+        run: npm run watchlater
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPO_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO_NAME: ${{ github.event.repository.name }}
+      - name: Save last chat update ID as an artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: telegram_last_update_id
+          path: telegram_last_update_id
+          if-no-files-found: error
 

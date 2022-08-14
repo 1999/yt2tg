@@ -1,40 +1,29 @@
 import { getNewPinnedMessages } from '../telegram';
-import { info, warning } from '@actions/core';
+import { info } from '@actions/core';
 import { promises as fs } from 'fs';
+import { readLatestArtifact } from '../github';
+import { checkEnvironmentVariableSet } from './environment';
 
-const CACHE_FILE_PATH = 'telegram_last_update_id';
-
-const getLastUpdateId = async (): Promise<string | undefined> => {
-  try {
-    return await fs.readFile(CACHE_FILE_PATH, { encoding: 'utf-8' });
-  } catch (err) {
-    warning('Could not find last update ID cache file');
-    return;
-  }
-};
-
-const setLastUpdateId = async (lastUpdateId: number): Promise<void> => {
-  await fs.writeFile(CACHE_FILE_PATH, lastUpdateId.toString());
-};
+const LAST_UPDATE_ARTIFACT_NAME = 'telegram_last_update_id';
 
 async function main() {
-  if (!process.env.TELEGRAM_BOT_TOKEN) {
-    throw new Error('TELEGRAM_BOT_TOKEN env is not set');
-  }
-
-  if (!process.env.TELEGRAM_CHAT_ID) {
-    throw new Error('TELEGRAM_CHAT_ID env is not set');
-  }
-
-  const lastUpdateId = await getLastUpdateId();
-  info(`Last update ID offset: ${lastUpdateId}`);
-
-  const pinnedMessages = await getNewPinnedMessages(
-    process.env.TELEGRAM_BOT_TOKEN,
-    process.env.TELEGRAM_CHAT_ID,
-    lastUpdateId
+  const [botToken, chatId, githubToken, githubRepoOwner, githubRepoName] = checkEnvironmentVariableSet(
+    'TELEGRAM_BOT_TOKEN',
+    'TELEGRAM_CHAT_ID',
+    'GITHUB_TOKEN',
+    'GITHUB_REPO_OWNER',
+    'GITHUB_REPO_NAME'
   );
 
+  const previousLastFetchDate = await readLatestArtifact(
+    githubRepoOwner,
+    githubRepoName,
+    githubToken,
+    LAST_UPDATE_ARTIFACT_NAME
+  );
+  info(`Last update ID offset: ${previousLastFetchDate}`);
+
+  const pinnedMessages = await getNewPinnedMessages(botToken, chatId, previousLastFetchDate);
   if (!pinnedMessages.length) {
     info('No new pinned messages');
     return;
@@ -46,9 +35,7 @@ async function main() {
 
   // get all updates: update.update_id and update.channel_post.pinned_message.text, update.channel_post.message_id
 
-  await setLastUpdateId(pinnedMessages.at(-1)!.id);
-
-  // telegram_last_update_id
+  await fs.writeFile(LAST_UPDATE_ARTIFACT_NAME, pinnedMessages.at(-1)!.id.toString());
 }
 
 main().catch((err: Error) => {
