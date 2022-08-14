@@ -1,3 +1,6 @@
+import { backOff } from 'exponential-backoff';
+import { warning } from '@actions/core';
+
 type Update = {
   id: number;
   message: {
@@ -19,6 +22,12 @@ type UpdatesResponse = {
     };
   }[];
 };
+
+class RateLimitError extends Error {
+  constructor() {
+    super('Failed to send message due to rate limit');
+  }
+}
 
 /**
  * @see https://core.telegram.org/bots/api#available-methods
@@ -48,15 +57,34 @@ const sendHttpRequest = async <TResponse>(
 };
 
 export const sendMesage = async (chatId: string, text: string, token: string): Promise<void> => {
-  const { response, status } = await sendHttpRequest<{ ok: boolean }>(token, 'sendMessage', {
-    chat_id: chatId,
-    text,
-    disable_notification: true,
-  });
+  await backOff(
+    async () => {
+      const { response, status } = await sendHttpRequest<{ ok: boolean }>(token, 'sendMessage', {
+        chat_id: chatId,
+        text,
+        disable_notification: true,
+      });
 
-  if (!response.ok) {
-    throw new Error(`Failed to send message (${status})`);
-  }
+      if (status === 429) {
+        throw new RateLimitError();
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to send message (${status})`);
+      }
+    },
+    {
+      numOfAttempts: 3,
+      retry: (err: Error, attemptNumber: number) => {
+        if (err instanceof RateLimitError) {
+          warning('Could not send message due to rate limit');
+          return true;
+        }
+
+        return false;
+      },
+    }
+  );
 };
 
 /**

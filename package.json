@@ -13,6 +13,7 @@
   "dependencies": {
     "@actions/core": "^1.9.0",
     "@octokit/core": "^4.0.4",
+    "exponential-backoff": "^3.1.0",
     "extract-zip": "^2.0.1",
     "googleapis": "^105.0.0",
     "node-fetch": "^3.2.9",
