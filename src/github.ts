@@ -101,3 +101,8 @@ export const readLatestArtifact = async (
 
   return await readArtifact(repoOwner, repoName, authToken, artifact);
 };
+
+export const parseRepository = (repository: string): { owner: string; name: string } => {
+  const chunks = repository.split('/');
+  return { owner: chunks[0], name: chunks[1] };
+};
