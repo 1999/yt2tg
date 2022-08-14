@@ -29,6 +29,8 @@ jobs:
           GOOGLE_OAUTH_CLIENT_SECRET: ${{ secrets.GOOGLE_OAUTH_CLIENT_SECRET }}
           GOOGLE_OAUTH_CLIENT_REDIRECT_URI: ${{ secrets.GOOGLE_OAUTH_CLIENT_REDIRECT_URI }}
           GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPO_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO_NAME: ${{ github.event.repository.name }}
       - name: Save last fetch date as an artifact
         uses: actions/upload-artifact@v3
         with:

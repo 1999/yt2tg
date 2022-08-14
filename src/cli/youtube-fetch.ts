@@ -6,10 +6,10 @@ import { checkEnvironmentVariableSet } from './environment';
 
 const LAST_FETCH_ARTIFACT_NAME = 'youtube_last_fetch_date';
 
-const getSinceDate = async (githubToken: string): Promise<Date> => {
+const getSinceDate = async (githubToken: string, githubRepoOwner: string, githubRepoName: string): Promise<Date> => {
   const previousLastFetchDate = await readLatestArtifact(
-    'repoOwner',
-    'repoName',
+    githubRepoOwner,
+    githubRepoName,
     githubToken,
     LAST_FETCH_ARTIFACT_NAME
   );
@@ -24,15 +24,18 @@ const getSinceDate = async (githubToken: string): Promise<Date> => {
 };
 
 async function main() {
-  const [clientId, clientSecret, redirectUri, credentials, githubToken] = checkEnvironmentVariableSet(
-    'GOOGLE_OAUTH_CLIENT_ID',
-    'GOOGLE_OAUTH_CLIENT_SECRET',
-    'GOOGLE_OAUTH_CLIENT_REDIRECT_URI',
-    'GOOGLE_OAUTH_CREDENTIALS',
-    'GITHUB_TOKEN'
-  );
+  const [clientId, clientSecret, redirectUri, credentials, githubToken, githubRepoOwner, githubRepoName] =
+    checkEnvironmentVariableSet(
+      'GOOGLE_OAUTH_CLIENT_ID',
+      'GOOGLE_OAUTH_CLIENT_SECRET',
+      'GOOGLE_OAUTH_CLIENT_REDIRECT_URI',
+      'GOOGLE_OAUTH_CREDENTIALS',
+      'GITHUB_TOKEN',
+      'GITHUB_REPO_OWNER',
+      'GITHUB_REPO_NAME'
+    );
 
-  const since = await getSinceDate(githubToken);
+  const since = await getSinceDate(githubToken, githubRepoOwner, githubRepoName);
   info(`Fetching videos since ${since}`);
 
   const channelVideos = await getNewVideos(clientId, clientSecret, redirectUri, JSON.parse(credentials), since);
