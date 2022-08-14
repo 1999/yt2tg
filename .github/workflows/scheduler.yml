@@ -1,10 +1,10 @@
 name: "Fetch new videos and send them to Telegram"
 on:
-#  schedule:
-#    - cron: 0 * * * *
+  schedule:
+    - cron: 0 * * * *
   # uncomment these two lines and comment "schedule" to debug on push
-  push:
-  pull_request:
+#  push:
+#  pull_request:
 jobs:
   fetch-and-send:
     runs-on: ubuntu-20.04
