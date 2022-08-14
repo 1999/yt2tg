@@ -37,9 +37,8 @@ jobs:
         run: npm run telegram
         with:
           videos: ${{ steps.youtube.outputs.videos }}
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          telegram_bot_token: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          telegram_chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
       - name: Save last chat update ID as an artifact
         uses: actions/upload-artifact@v3
         with:

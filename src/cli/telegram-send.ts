@@ -1,11 +1,11 @@
 import { getInput, info } from '@actions/core';
 import { sendMesage } from '../telegram';
-import { checkEnvironmentVariableSet } from './environment';
 
 async function main() {
-  const [botToken, chatId] = checkEnvironmentVariableSet('TELEGRAM_BOT_TOKEN', 'TELEGRAM_CHAT_ID');
-
+  const botToken = getInput('telegram_bot_token', { required: true });
+  const chatId = getInput('telegram_chat_id', { required: true });
   const fetchedVideos = getInput('videos', { required: true });
+
   const videos = JSON.parse(fetchedVideos) as string[];
   info(`Videos found: ${videos.length}`);
 
