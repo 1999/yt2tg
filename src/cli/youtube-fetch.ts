@@ -7,7 +7,12 @@ import { checkEnvironmentVariableSet } from './environment';
 const LAST_FETCH_ARTIFACT_NAME = 'youtube_last_fetch_date';
 
 const getSinceDate = async (githubToken: string): Promise<Date> => {
-  const previousLastFetchDate = await readLatestArtifact(repoOwner, repoName, githubToken, LAST_FETCH_ARTIFACT_NAME);
+  const previousLastFetchDate = await readLatestArtifact(
+    'repoOwner',
+    'repoName',
+    githubToken,
+    LAST_FETCH_ARTIFACT_NAME
+  );
   if (previousLastFetchDate) {
     return new Date(previousLastFetchDate);
   }
