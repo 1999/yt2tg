@@ -1,4 +1,4 @@
-import { getNewPinnedMessages } from '../telegram';
+import { getNewPinnedMessages, unpinMessage } from '../telegram';
 import { info } from '@actions/core';
 import { promises as fs } from 'fs';
 import { readLatestArtifact } from '../github';
@@ -15,27 +15,23 @@ async function main() {
     'GITHUB_REPO_NAME'
   );
 
-  const previousLastFetchDate = await readLatestArtifact(
+  const lastUpdateOffset = await readLatestArtifact(
     githubRepoOwner,
     githubRepoName,
     githubToken,
     LAST_UPDATE_ARTIFACT_NAME
   );
-  info(`Last update ID offset: ${previousLastFetchDate}`);
+  info(`Last update ID offset: ${lastUpdateOffset}`);
 
-  const pinnedMessages = await getNewPinnedMessages(botToken, chatId, previousLastFetchDate);
-  if (!pinnedMessages.length) {
-    info('No new pinned messages');
-    return;
+  const pinnedEvents = await getNewPinnedMessages(botToken, chatId, lastUpdateOffset);
+  for (const event of pinnedEvents) {
+    await unpinMessage(botToken, chatId, event.message.id);
   }
 
-  console.log(JSON.stringify(pinnedMessages, null, 2));
-
-  // await unpinMessage(process.env.TELEGRAM_BOT_TOKEN, process.env.TELEGRAM_CHAT_ID, 107);
-
-  // get all updates: update.update_id and update.channel_post.pinned_message.text, update.channel_post.message_id
-
-  await fs.writeFile(LAST_UPDATE_ARTIFACT_NAME, pinnedMessages.at(-1)!.id.toString());
+  if (pinnedEvents.length || lastUpdateOffset) {
+    const offset = pinnedEvents.length ? pinnedEvents.at(-1)!.id.toString() : lastUpdateOffset;
+    await fs.writeFile(LAST_UPDATE_ARTIFACT_NAME, offset!);
+  }
 }
 
 main().catch((err: Error) => {
